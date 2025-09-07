@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .result-positive {
+            background-color: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+        .result-negative {
+            background-color: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .confidence-bars {
+            margin: 20px 0;
+        }
+        .confidence-bar {
+            background-color: #e0e0e0;
+            height: 25px;
+            border-radius: 12px;
+            margin: 10px 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .confidence-fill-positive {
+            background-color: #28a745;
+            height: 100%;
+            border-radius: 12px;
+        }
+        .confidence-fill-negative {
+            background-color: #dc3545;
+            height: 100%;
+            border-radius: 12px;
+        }
+        .confidence-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 25px;
+            color: white;
+            font-weight: bold;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .words-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .word-positive {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .word-negative {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Sentiment Analysis Results</h1>
+        
+        {% if error %}
+            <div class="error">
+                <h3>Error:</h3>
+                <p>{{ error }}</p>
+            </div>
+        {% else %}
+            <!-- Main Result -->
+            <div class="result-box {% if sentiment == 'Positive' %}result-positive{% else %}result-negative{% endif %}">
+                <h2>Sentiment: {{ sentiment }}</h2>
+                <h3>Confidence: {{ confidence }}%</h3>
+            </div>
+            
+            <!-- Confidence Breakdown -->
+            <div class="confidence-bars">
+                <h4>Confidence Breakdown:</h4>
+                <div>Positive:</div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill-positive" style="width: {{ positive_confidence }}%"></div>
+                    <div class="confidence-text">{{ positive_confidence }}%</div>
+                </div>
+                <div>Negative:</div>
+                <div class="confidence-bar">
+                    <div class="confidence-fill-negative" style="width: {{ negative_confidence }}%"></div>
+                    <div class="confidence-text">{{ negative_confidence }}%</div>
+                </div>
+            </div>
+            
+            <!-- Original Comment -->
+            <div class="section">
+                <h4>📝 Original Comment:</h4>
+                <p><em>"{{ original_comment }}"</em></p>
+            </div>
+            
+            <!-- Processed Comment -->
+            <div class="section">
+                <h4>🔧 After Preprocessing:</h4>
+                <p><code>{{ cleaned_comment }}</code></p>
+                <small>This shows your text after cleaning, removing stopwords, and lemmatization - just like in the notebook!</small>
+            </div>
+            
+            <!-- Influential Words -->
+            {% if top_words %}
+            <div class="section">
+                <h4>🔍 Most Influential Words:</h4>
+                <div class="words-list">
+                    {% for word, score in top_words %}
+                        <span class="{% if score > 0 %}word-positive{% else %}word-negative{% endif %}">
+                            {{ word }} ({{ "%.3f"|format(score) }})
+                        </span>
+                    {% endfor %}
+                </div>
+                <small>Green words push toward positive, red words push toward negative. Numbers show influence strength.</small>
+            </div>
+            {% endif %}
+            
+            <!-- How it Works -->
+            <div class="section">
+                <h4>🧠 How This Was Calculated:</h4>
+                <ol>
+                    <li><strong>Text Cleaning:</strong> Removed HTML, URLs, punctuation, numbers, and stopwords</li>
+                    <li><strong>Normalization:</strong> Applied lemmatization to reduce words to base forms</li>
+                    <li><strong>Vectorization:</strong> Converted text to numbers using Bag of Words (trained on 7,000 movie reviews)</li>
+                    <li><strong>Prediction:</strong> Used Logistic Regression model (87% accuracy) to classify sentiment</li>
+                    <li><strong>Confidence:</strong> Model probability scores for each class</li>
+                </ol>
+            </div>
+        {% endif %}
+        
+        <a href="/" class="back-button">🔙 Analyze Another Comment</a>
+    </div>
+</body>
+</html>
