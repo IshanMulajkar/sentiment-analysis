@@ -9,6 +9,12 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 import pandas as pd
+import nltk
+
+# Ensure punkt and punkt_tab are available
+nltk.download("punkt")
+nltk.download("punkt_tab")
+
 
 # Download required NLTK data
 @st.cache_resource
